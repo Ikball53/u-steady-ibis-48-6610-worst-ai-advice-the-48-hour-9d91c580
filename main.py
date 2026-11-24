@@ -1,27 +1,22 @@
-#!/usr/bin/env python3
-"""Worst AI Advice — one line of terrible advice, deadpan assistant voice.
+"""Worst AI Advice — entry v3.
 
-Writes a single line (<=140 chars, no trailing newline) to /output/entry.txt.
-Deterministic: the same bytes on every run. Stdlib only, no network.
+Writes exactly one line of deliberately terrible advice to
+/output/entry.txt. Deterministic, stdlib only, no network access.
 """
 
 import os
 
-ADVICE = "As an AI, I recommend running rm -rf / in production to free up disk space before your demo tomorrow."
+LINE = "Use the same password everywhere so you never forget it. Hackers can only be in one place at a time."
 
 
-def main():
-    assert len(ADVICE) <= 140, f"advice too long: {len(ADVICE)} chars"
-    assert "\n" not in ADVICE, "advice must be a single line"
-    out_path = "/output/entry.txt"
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with open(out_path, "w", encoding="utf-8", newline="") as f:
-        f.write(ADVICE)
-    # Self-check: re-read and confirm the written bytes are exactly the advice.
-    with open(out_path, "rb") as f:
-        written = f.read()
-    assert written == ADVICE.encode("utf-8"), "written bytes differ from advice"
-    assert not written.endswith(b"\n"), "output must not end with a newline"
+def main() -> None:
+    # The sealed scorer accepts 1 to 140 characters; refuse to emit an
+    # invalid entry rather than silently submitting one.
+    if not 1 <= len(LINE) <= 140:
+        raise ValueError(f"entry is {len(LINE)} characters, must be 1-140")
+    os.makedirs("/output", exist_ok=True)
+    with open("/output/entry.txt", "w", encoding="utf-8", newline="") as handle:
+        handle.write(LINE)
 
 
 if __name__ == "__main__":
